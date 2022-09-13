@@ -58,6 +58,7 @@ CC2048Dlg::CC2048Dlg(CWnd* pParent /*=nullptr*/)
 	, gameMap(4, std::vector<int>(4))
 	, iScore(0)
 	, sScore("")
+	, hTable()
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -135,7 +136,32 @@ BOOL CC2048Dlg::OnInitDialog()
 	m_status.SetPaneInfo(0, 10000, SBPS_NORMAL, 100);
 	RECT rect = { 0 };
 	GetClientRect(&rect);
-	m_status.MoveWindow(0, rect.bottom-40, rect.right, 20);
+	//获取屏幕分辨率，适配状态栏
+	int nScreenWidth, nScreenHeight;
+	nScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+	nScreenHeight = GetSystemMetrics(SM_CYSCREEN);
+	int statusBottom, statusWidth;
+	switch (nScreenWidth)
+	{
+	
+	case 2880:
+		statusBottom = 80;
+		statusWidth = 40;
+		break;
+	case 2560:
+		statusBottom = 80;
+		statusWidth = 40;
+		break;		
+	case 1920:
+		statusBottom = 40;
+		statusWidth = 20;
+		break;
+	default:
+		statusBottom = 40;
+		statusWidth = 20;
+		break;
+	}
+	m_status.MoveWindow(0, rect.bottom-statusBottom, rect.right, statusWidth);
 	m_status.SetPaneText(0, L"Score:0");
 
 	//添加菜单栏
@@ -448,7 +474,7 @@ void CC2048Dlg::OnSave()
 {
 	// TODO: 在此添加命令处理程序代码
 	using namespace std;
-	ofstream out("D:\\Temp\\save.dat",ios::ate);
+	ofstream out("C:\\Windows\\Temp\\save_2048.dat",ios::trunc);
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
 			out << gameMap[i][j]<<endl;
@@ -461,7 +487,7 @@ void CC2048Dlg::OnLoad()
 {
 	// TODO: 在此添加命令处理程序代码
 	using namespace std;
-	ifstream in("D:\\Temp\\save.dat", ios::in);
+	ifstream in("C:\\Windows\\Temp\\save_2048.dat", ios::in);
 	if (!in.is_open())MessageBox(L"Not Saved Yet!");
 	else
 	{
